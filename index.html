@@ -15,9 +15,9 @@
   --bg2: #141414;
   --bg3: #1e1e1e;
   --bg4: #282828;
-  --text: #f0f0f0;
-  --text2: #888;
-  --text3: #555;
+  --text: #f5f5f5;
+  --text2: #c0c0c0;
+  --text3: #888;
   --accent: #ff7b35;
   --accent2: #e05e1a;
   --red: #ff5c5c;
@@ -70,7 +70,7 @@ body { display: flex; flex-direction: column; }
 
 /* CARDS */
 .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
-.card-title { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.card-title { font-size: 11px; color: #a0a0a0; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 12px; }
 .section-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: -0.3px; }
 .section-sub { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
 
@@ -139,7 +139,7 @@ input[type=range]::-webkit-slider-thumb {
 /* STATS */
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .stat-card { background: var(--bg3); border-radius: var(--radius-sm); padding: 14px; }
-.stat-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+.stat-label { font-size: 11px; color: #a0a0a0; margin-bottom: 6px; font-weight: 500; }
 .stat-val { font-size: 24px; font-weight: 600; color: var(--text); font-family: var(--mono); letter-spacing: -0.5px; }
 .stat-unit { font-size: 12px; color: var(--text3); font-weight: 400; font-family: var(--font); }
 
@@ -171,7 +171,7 @@ input[type=range]::-webkit-slider-thumb {
 
 /* CARDIO */
 .cardio-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.form-field label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.form-field label { display: block; font-size: 11px; color: #a0a0a0; margin-bottom: 6px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 .form-field input, .form-field select {
   width: 100%; background: var(--bg3); border: 1px solid var(--border2);
   border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px;
@@ -212,6 +212,30 @@ input[type=range]::-webkit-slider-thumb {
 .timer-display { font-size: 48px; font-weight: 600; font-family: var(--mono); color: var(--accent); text-align: center; margin: 10px 0; letter-spacing: -2px; }
 .timer-label { text-align: center; font-size: 12px; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
 .timer-btns { display: flex; gap: 8px; }
+
+/* TIMER OVERLAY */
+.timer-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--bg); padding: 24px;
+}
+.timer-ring-wrap { position: relative; width: 220px; height: 220px; margin: 0 auto 24px; }
+.timer-ring-wrap svg { transform: rotate(-90deg); }
+.timer-ring-bg { fill: none; stroke: var(--bg3); stroke-width: 8; }
+.timer-ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
+.timer-ring-time { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.timer-ring-secs { font-size: 56px; font-weight: 600; font-family: var(--mono); letter-spacing: -3px; color: var(--text); line-height: 1; }
+.timer-ring-phase { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.timer-name { font-size: 16px; font-weight: 500; color: var(--text); text-align: center; margin-bottom: 6px; }
+.timer-detail { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 28px; }
+.timer-rounds { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.timer-round-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg3); border: 1.5px solid var(--border2); transition: all 0.2s; }
+.timer-round-dot.active { background: var(--accent); border-color: var(--accent); transform: scale(1.2); }
+.timer-round-dot.done { background: var(--bg4); border-color: var(--border); }
+.timer-actions { display: flex; gap: 12px; width: 100%; max-width: 320px; }
+.timer-btn-main { flex: 1; padding: 16px; background: var(--accent); color: #0a0a0a; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; font-family: var(--font); cursor: pointer; }
+.timer-btn-skip { padding: 16px 20px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 14px; font-family: var(--font); cursor: pointer; }
+.timer-btn-close { position: absolute; top: max(env(safe-area-inset-top),16px); right: 16px; background: var(--bg3); border: none; color: var(--text2); font-size: 13px; font-family: var(--font); padding: 8px 14px; border-radius: 20px; cursor: pointer; }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 0; }
@@ -526,6 +550,10 @@ const exerciseDB = {
       { name:'Extensión tríceps goma', detail:'3 × 12 reps', tag:'fuerza', muscle:'brazos', equipo:['gomas'], desc:'Pisa la goma, sube los brazos sobre la cabeza con agarre neutro. Extiende completamente los codos. Controla la bajada.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×12'], video:'extension triceps goma elastica' },
       { name:'Curl biceps goma', detail:'3 × 12 reps', tag:'fuerza', muscle:'brazos', equipo:['gomas'], desc:'Pisa la goma con los dos pies, sujeta los extremos. Curl normal. Útil para calentamiento o sesiones de volumen alto.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×12'], video:'curl biceps goma elastica' },
       { name:'Fondos en silla (tríceps)', detail:'3 × 10-15 reps', tag:'fuerza', muscle:'brazos', equipo:['banco','esterilla'], desc:'Manos en el borde de la silla detrás de ti, pies al frente. Baja doblando los codos a 90°. Empuja arriba.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×10'], video:'fondos triceps silla' },
+      { name:'Curl concentrado', detail:'3 × 12 reps c/lado', tag:'fuerza', muscle:'brazos', equipo:['mancuernas'], desc:'Sentado, codo apoyado en el muslo interno. Curl completo sin balancear el cuerpo. Máximo aislamiento del bíceps. Aprieta fuerte arriba.', sets:['Set 1: 8kg×12','Set 2: 10kg×10','Set 3: 10kg×10'], video:'curl concentrado biceps' },
+      { name:'Kickback tríceps', detail:'3 × 12 reps c/lado', tag:'fuerza', muscle:'brazos', equipo:['mancuernas'], desc:'Inclinado, codo pegado al cuerpo a 90°. Extiende el antebrazo hacia atrás hasta alinear el brazo. Mantén 1s arriba. Trabaja la cabeza larga del tríceps.', sets:['Set 1: 6kg×12','Set 2: 8kg×12','Set 3: 8kg×12'], video:'kickback triceps mancuerna' },
+      { name:'Curl 21s', detail:'3 series de 21 reps', tag:'fuerza', muscle:'brazos', equipo:['mancuernas'], desc:'7 reps de la parte baja (0-90°), 7 reps de la parte alta (90-arriba), 7 reps completas. Sin descanso entre los tres bloques. Bomba de bíceps total.', sets:['Set 1: 6kg×21','Set 2: 8kg×21','Set 3: 8kg×21'], video:'curl 21s biceps tutorial' },
+      { name:'Extensión tríceps mancuerna (una mano)', detail:'3 × 12 reps c/lado', tag:'fuerza', muscle:'brazos', equipo:['mancuernas'], desc:'De pie, sube una mancuerna detrás de la cabeza con un brazo. Extiende el codo sin mover el húmero. Agarra el codo con la otra mano para estabilizar.', sets:['Set 1: 6kg×12','Set 2: 8kg×12','Set 3: 8kg×12'], video:'extension triceps mancuerna una mano' },
     ],
     // HOMBROS
     hombros: [
@@ -534,6 +562,10 @@ const exerciseDB = {
       { name:'Elevaciones frontales', detail:'3 × 10 reps', tag:'fuerza', muscle:'hombros', equipo:['mancuernas','mancuernas3'], desc:'Sube las mancuernas hacia adelante hasta la altura de los hombros. Alterna brazos o hazlo simultáneo. Agarre prono.', sets:['Set 1: 4kg×10','Set 2: 4kg×10','Set 3: 4kg×10'], video:'elevaciones frontales mancuernas' },
       { name:'Pájaros mancuernas', detail:'3 × 12 reps', tag:'fuerza', muscle:'hombros', equipo:['mancuernas','mancuernas3'], desc:'Inclinado hacia adelante, eleva las mancuernas hacia los lados. Trabaja deltoides posterior. Codos ligeramente flexionados.', sets:['Set 1: 4kg×12','Set 2: 4kg×12','Set 3: 3kg×15'], video:'pajaros mancuernas deltoides posterior' },
       { name:'Press Arnold', detail:'3 × 10 reps', tag:'fuerza', muscle:'hombros', equipo:['mancuernas'], desc:'Empieza con mancuernas delante (como al final de un curl), gira las palmas mientras subes a press. Trabaja todo el deltoides.', sets:['Set 1: 8kg×10','Set 2: 8kg×10','Set 3: 8kg×10'], video:'press arnold mancuernas' },
+      { name:'Face pull con goma', detail:'3 × 15 reps', tag:'fuerza', muscle:'hombros', equipo:['gomas'], desc:'Ancla la goma a la altura de la cara. Tira hacia la frente abriendo los codos hacia fuera. Trabaja deltoides posterior y manguito rotador. Previene lesiones.', sets:['Set 1: ×15','Set 2: ×15','Set 3: ×15'], video:'face pull goma elastica' },
+      { name:'Elevaciones laterales con goma', detail:'3 × 15 reps', tag:'fuerza', muscle:'hombros', equipo:['gomas'], desc:'Pisa la goma, sube los brazos en T. La resistencia aumenta al subir, diferente estímulo que la mancuerna. Ideal para congestión y pump.', sets:['Set 1: ×15','Set 2: ×15','Set 3: ×15'], video:'elevaciones laterales goma elastica' },
+      { name:'Press hombro con KB', detail:'3 × 10 reps c/lado', tag:'fuerza', muscle:'hombros', equipo:['kettlebell'], desc:'KB en posición rack (sobre el antebrazo). Empuja arriba girando el puño al extender. Baja controlando. El agarre inestable activa más el core.', sets:['Set 1: 8kg×10','Set 2: 8kg×10','Set 3: 8kg×10'], video:'press hombro kettlebell un brazo' },
+      { name:'Halo kettlebell', detail:'3 × 10 reps c/dirección', tag:'fuerza', muscle:'hombros', equipo:['kettlebell'], desc:'Sujeta la KB por las asas con ambas manos. Pásala alrededor de la cabeza en círculo sin mover las caderas. Trabaja hombros, core y movilidad torácica.', sets:['Set 1: ×10 izq','Set 2: ×10 der','Set 3: ×10 alt'], video:'halo kettlebell ejercicio' },
     ],
     // PECHO
     pecho: [
@@ -542,6 +574,10 @@ const exerciseDB = {
       { name:'Flexiones clásicas', detail:'4 × máx reps', tag:'fuerza', muscle:'pecho', equipo:['esterilla'], desc:'Manos a la anchura de los hombros, cuerpo recto. Baja hasta casi tocar el suelo. Empuja hasta extender los codos. Core siempre activado.', sets:['Set 1: ×15','Set 2: ×12','Set 3: ×10','Set 4: ×10'], video:'flexiones correctas tutorial' },
       { name:'Aperturas mancuernas suelo', detail:'3 × 12 reps', tag:'fuerza', muscle:'pecho', equipo:['mancuernas','esterilla'], desc:'Tumbado, brazos extendidos arriba. Abre los brazos en arco hasta el suelo, codos ligeramente flexionados. Cierra apretando el pecho.', sets:['Set 1: 6kg×12','Set 2: 8kg×12','Set 3: 8kg×12'], video:'aperturas mancuernas suelo' },
       { name:'Flexiones diamante', detail:'3 × 10 reps', tag:'fuerza', muscle:'pecho', equipo:['esterilla'], desc:'Manos juntas formando un rombo bajo el pecho. Más difícil, activa tríceps y pecho interno. Mantén los codos cerca del cuerpo.', sets:['Set 1: ×10','Set 2: ×10','Set 3: ×8'], video:'flexiones diamante triceps' },
+      { name:'Flexiones inclinadas', detail:'3 × 12 reps', tag:'fuerza', muscle:'pecho', equipo:['banco','esterilla'], desc:'Manos elevadas en el banco o silla. Ángulo más fácil que en el suelo, trabaja la parte baja del pecho. Ideal para progresar hacia flexiones normales.', sets:['Set 1: ×15','Set 2: ×12','Set 3: ×12'], video:'flexiones inclinadas pecho bajo' },
+      { name:'Flexiones declinadas', detail:'3 × 10 reps', tag:'fuerza', muscle:'pecho', equipo:['banco','esterilla'], desc:'Pies elevados en el banco, manos en el suelo. Trabaja la parte alta del pecho y deltoides anterior. Más difícil que la flexión normal.', sets:['Set 1: ×10','Set 2: ×10','Set 3: ×8'], video:'flexiones declinadas pecho alto' },
+      { name:'Flexiones arqueras', detail:'3 × 6 reps c/lado', tag:'fuerza', muscle:'pecho', equipo:['esterilla'], desc:'Manos separadas. Baja hacia un lado doblando ese codo mientras el otro brazo queda casi extendido. Alterna. Variante unilateral que progresa hacia flexión a una mano.', sets:['Set 1: ×6','Set 2: ×6','Set 3: ×6'], video:'flexiones arqueras archer pushup' },
+      { name:'Pullover mancuerna', detail:'3 × 12 reps', tag:'fuerza', muscle:'pecho', equipo:['mancuernas','esterilla'], desc:'Tumbado, mancuerna con ambas manos sobre el pecho. Lleva los brazos hacia atrás por encima de la cabeza hasta el suelo. Vuelve apretando pecho y dorsal.', sets:['Set 1: 8kg×12','Set 2: 10kg×10','Set 3: 10kg×10'], video:'pullover mancuerna pecho dorsal' },
     ],
     // ESPALDA
     espalda: [
@@ -550,6 +586,10 @@ const exerciseDB = {
       { name:'Jalón goma al pecho', detail:'3 × 12 reps', tag:'fuerza', muscle:'espalda', equipo:['gomas'], desc:'Ancla la goma arriba (puerta). Siéntate en el suelo, tira hacia el pecho abriendo los codos. Imita el jalón al pecho.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×12'], video:'jalon goma elastica espalda' },
       { name:'Remo goma al abdomen', detail:'3 × 12 reps', tag:'fuerza', muscle:'espalda', equipo:['gomas'], desc:'Ancla la goma a media altura. De pie o sentado, tira hacia el abdomen con los codos pegados. Aprieta omóplatos al final.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×12'], video:'remo goma elastica espalda' },
       { name:'Superman / extensiones', detail:'3 × 12 reps', tag:'fuerza', muscle:'espalda', equipo:['esterilla'], desc:'Boca abajo, levanta brazos y piernas del suelo simultáneamente. Mantén 2 segundos arriba. Trabaja lumbar y parte posterior.', sets:['Set 1: ×12×2s','Set 2: ×12×2s','Set 3: ×12×2s'], video:'superman espalda baja ejercicio' },
+      { name:'Remo mancuernas bilateral', detail:'4 × 10 reps', tag:'fuerza', muscle:'espalda', equipo:['mancuernas'], desc:'Inclinado 45° con mancuernas colgando. Tira ambas mancuernas simultáneamente hacia el abdomen. Aprieta omóplatos al final. Más carga que el remo unilateral.', sets:['Set 1: 8kg×10','Set 2: 10kg×10','Set 3: 10kg×10','Set 4: 8kg×10'], video:'remo mancuernas bilateral inclinado' },
+      { name:'Good morning', detail:'3 × 12 reps', tag:'fuerza', muscle:'espalda', equipo:['mancuernas'], desc:'De pie con una mancuerna ligera en los hombros. Bisagra de cadera hacia adelante con espalda recta hasta sentir tensión en isquios. Sube apretando glúteo. Lumbar y cadena posterior.', sets:['Set 1: 6kg×12','Set 2: 8kg×12','Set 3: 8kg×12'], video:'good morning ejercicio espalda' },
+      { name:'Extensión lumbar en suelo', detail:'3 × 15 reps', tag:'fuerza', muscle:'espalda', equipo:['esterilla'], desc:'Boca abajo, manos detrás de la cabeza. Levanta el torso del suelo contrayendo la zona lumbar. Baja controlando. Sin impulso. Construye resistencia lumbar.', sets:['Set 1: ×15','Set 2: ×15','Set 3: ×15'], video:'extension lumbar suelo espalda baja' },
+      { name:'Jalón goma agarre estrecho', detail:'3 × 12 reps', tag:'fuerza', muscle:'espalda', equipo:['gomas'], desc:'Ancla la goma arriba. Tira con los codos pegados al cuerpo hacia las caderas. Agarre neutro. Trabaja más el dorsal inferior y el redondo mayor.', sets:['Set 1: ×12','Set 2: ×12','Set 3: ×12'], video:'jalon agarre estrecho goma espalda' },
     ],
     // PIERNAS
     piernas: [
@@ -559,6 +599,10 @@ const exerciseDB = {
       { name:'Hip thrust (peso corporal)', detail:'4 × 15 reps', tag:'fuerza', muscle:'piernas', equipo:['banco','esterilla'], desc:'Hombros apoyados en banco/silla, pies en el suelo. Sube las caderas apretando el glúteo arriba. Mantén 1 segundo y baja.', sets:['Set 1: ×15','Set 2: ×15','Set 3: ×15','Set 4: ×15'], video:'hip thrust peso corporal' },
       { name:'Sentadilla pared (isométrica)', detail:'3 × 45s', tag:'fuerza', muscle:'piernas', equipo:['esterilla'], desc:'Espalda contra la pared, rodillas a 90°. Mantén la posición. Excelente para cuádriceps sin impacto en las rodillas.', sets:['Set 1: ×45s','Set 2: ×45s','Set 3: ×45s'], video:'sentadilla pared isometrica' },
       { name:'Peso muerto mancuernas', detail:'4 × 10 reps', tag:'fuerza', muscle:'piernas', equipo:['mancuernas'], desc:'Mancuernas delante de los muslos. Bisagra de cadera: baja inclinándote hacia adelante con espalda recta hasta sentir los isquios. Sube apretando glúteo.', sets:['Set 1: 8kg×10','Set 2: 10kg×10','Set 3: 10kg×10','Set 4: 8kg×10'], video:'peso muerto mancuernas tutorial' },
+      { name:'Peso muerto rumano una pierna', detail:'3 × 8 reps c/lado', tag:'fuerza', muscle:'piernas', equipo:['mancuernas'], desc:'De pie sobre una pierna, inclínate hacia adelante bajando la mancuerna mientras la pierna libre sube atrás. Trabaja isquios, glúteo y equilibrio. Clave para estabilidad.', sets:['Set 1: 6kg×8','Set 2: 8kg×8','Set 3: 8kg×8'], video:'peso muerto rumano una pierna mancuerna' },
+      { name:'Elevación de gemelos', detail:'4 × 20 reps', tag:'fuerza', muscle:'piernas', equipo:['esterilla'], desc:'De pie, sube sobre las puntas de los pies todo lo que puedas. Mantén 1 segundo arriba. Baja controlando. Puedes sostenerte en la pared. Añade mancuernas para más carga.', sets:['Set 1: ×20','Set 2: ×20','Set 3: ×20','Set 4: ×20'], video:'elevacion gemelos calf raise' },
+      { name:'Step-up con mancuernas', detail:'3 × 10 reps c/lado', tag:'fuerza', muscle:'piernas', equipo:['mancuernas','banco'], desc:'Sube al banco/silla con una pierna llevando la rodilla contraria arriba. Baja controlando. Trabaja cuádriceps, glúteo y equilibrio de forma unilateral.', sets:['Set 1: 6kg×10','Set 2: 8kg×10','Set 3: 8kg×10'], video:'step up mancuernas banco' },
+      { name:'Sentadilla sumo KB', detail:'4 × 12 reps', tag:'fuerza', muscle:'piernas', equipo:['kettlebell'], desc:'Pies muy separados y puntas hacia fuera. KB colgando entre las piernas. Baja con la espalda recta. Trabaja más el aductor y glúteo que la sentadilla normal.', sets:['Set 1: 8kg×12','Set 2: 8kg×12','Set 3: 8kg×12','Set 4: 8kg×12'], video:'sentadilla sumo kettlebell' },
     ],
     // CORE
     core: [
@@ -567,6 +611,11 @@ const exerciseDB = {
       { name:'Russian twist (KB)', detail:'3 × 20 reps', tag:'fuerza', muscle:'core', equipo:['kettlebell'], desc:'Sentado con las piernas elevadas, sujeta la KB. Gira el torso de lado a lado tocando el suelo. Mantén la espalda recta.', sets:['Set 1: 8kg×20','Set 2: 8kg×20','Set 3: 8kg×20'], video:'russian twist kettlebell' },
       { name:'Dead bug', detail:'3 × 10 reps c/lado', tag:'fuerza', muscle:'core', equipo:['esterilla'], desc:'Tumbado boca arriba, brazos y piernas arriba. Baja el brazo y pierna opuestos hasta casi tocar el suelo. Excelente para estabilidad lumbar.', sets:['Set 1: ×10','Set 2: ×10','Set 3: ×10'], video:'dead bug ejercicio core' },
       { name:'Plancha lateral', detail:'3 × 30s c/lado', tag:'fuerza', muscle:'core', equipo:['esterilla'], desc:'Apoyado en un codo y el borde del pie. Cuerpo recto lateral. Mantén las caderas levantadas. Trabaja el oblicuo.', sets:['Set 1: ×30s','Set 2: ×30s','Set 3: ×30s'], video:'plancha lateral oblicuos' },
+      { name:'Ab wheel / plancha con deslizamiento', detail:'3 × 8 reps', tag:'fuerza', muscle:'core', equipo:['esterilla'], desc:'Desde rodillas, extiende los brazos hacia adelante deslizando las manos lo máximo posible sin hundir la cadera. Vuelve contrayendo el core. Brutal para recto abdominal.', sets:['Set 1: ×8','Set 2: ×8','Set 3: ×8'], video:'ab rollout suelo core' },
+      { name:'Hollow body hold', detail:'3 × 30s', tag:'fuerza', muscle:'core', equipo:['esterilla'], desc:'Tumbado, presiona la espalda baja contra el suelo, levanta piernas y hombros unos 15cm. Brazos estirados. Mantén la posición. El ejercicio base de la gimnasia para core.', sets:['Set 1: ×30s','Set 2: ×30s','Set 3: ×30s'], video:'hollow body hold core gimnasia' },
+      { name:'Crunch de bicicleta', detail:'3 × 20 reps', tag:'fuerza', muscle:'core', equipo:['esterilla'], desc:'Tumbado, manos en la cabeza. Lleva codo derecho a rodilla izquierda y alterna. Piernas sin apoyar en el suelo. Trabaja oblicuos y recto abdominal.', sets:['Set 1: ×20','Set 2: ×20','Set 3: ×20'], video:'crunch bicicleta oblicuos' },
+      { name:'Pallof press con goma', detail:'3 × 10 reps c/lado', tag:'fuerza', muscle:'core', equipo:['gomas'], desc:'Ancla la goma a media altura. De pie lateral a ella, extiende los brazos al frente resistiendo la rotación. Anti-rotación pura. Uno de los mejores ejercicios de core funcional.', sets:['Set 1: ×10 izq','Set 2: ×10 der','Set 3: ×10 alt'], video:'pallof press goma elastica core' },
+      { name:'Turkish get-up (KB)', detail:'3 × 3 reps c/lado', tag:'fuerza', muscle:'core', equipo:['kettlebell'], desc:'Tumbado con KB en mano alzada, levántate hasta de pie siguiendo la secuencia completa. El ejercicio más completo de core, movilidad y fuerza. Haz cada rep muy lento.', sets:['Set 1: 8kg×3','Set 2: 8kg×3','Set 3: 8kg×3'], video:'turkish get up kettlebell tutorial' },
     ],
   },
   hiit: [
@@ -577,6 +626,12 @@ const exerciseDB = {
     { name:'Saltos tijera', detail:'4 rondas × 45s', tag:'hiit', muscle:'full', equipo:['esterilla'], desc:'Jumping jacks a ritmo máximo con los brazos bien extendidos.', sets:['Ronda 1','Ronda 2','Ronda 3','Ronda 4'], video:'jumping jacks hiit' },
     { name:'Circuito KB (KB complex)', detail:'3 rondas × 8 reps c/ejercicio', tag:'hiit', muscle:'full', equipo:['kettlebell'], desc:'Sin soltar la KB: swing × 8 → goblet squat × 8 → halo × 8 → press × 8. Sin descanso entre ejercicios. 90s entre rondas.', sets:['Ronda 1','Ronda 2','Ronda 3'], video:'kettlebell complex circuito' },
     { name:'Flexiones rápidas', detail:'4 × máx en 30s', tag:'hiit', muscle:'pecho', equipo:['esterilla'], desc:'Flexiones a máxima velocidad durante 30 segundos. Descansa 30s. Versión explosiva: despega las manos del suelo.', sets:['Set 1','Set 2','Set 3','Set 4'], video:'flexiones explosivas hiit' },
+    { name:'Tabata sentadillas', detail:'8 rondas × 20s / 10s descanso', tag:'hiit', muscle:'piernas', equipo:['esterilla'], desc:'El protocolo Tabata clásico aplicado a sentadillas. 20 segundos al máximo, 10 de descanso, 8 rondas. 4 minutos totales de puro infierno para piernas y cardio.', sets:['Rondas 1-4','Rondas 5-8'], video:'tabata sentadillas protocolo' },
+    { name:'Sprints en sitio', detail:'6 × 20s / 40s descanso', tag:'hiit', muscle:'full', equipo:['esterilla'], desc:'Corre en el sitio a máxima velocidad levantando las rodillas alto durante 20 segundos. Descansa 40s. Sencillo pero brutalmente efectivo para el sistema cardiorrespiratorio.', sets:['Sprint 1','Sprint 2','Sprint 3','Sprint 4','Sprint 5','Sprint 6'], video:'sprint en sitio high knees hiit' },
+    { name:'Burpee con mancuerna', detail:'4 × 8 reps', tag:'hiit', muscle:'full', equipo:['mancuernas','esterilla'], desc:'Burpee normal pero al subir haces un curl + press con mancuernas. Combina fuerza y cardio en el mismo movimiento. Más técnico pero muy efectivo.', sets:['Set 1: ×8','Set 2: ×8','Set 3: ×8','Set 4: ×8'], video:'burpee con mancuernas fuerza cardio' },
+    { name:'Zancadas alternas con salto', detail:'4 × 10 reps c/lado', tag:'hiit', muscle:'piernas', equipo:['esterilla'], desc:'En posición de zancada, salta y cambia de pierna en el aire. Aterriza suave. Trabaja potencia de pierna y cardio. Rodillas siempre hacia fuera al aterrizar.', sets:['Set 1: ×10','Set 2: ×10','Set 3: ×10','Set 4: ×10'], video:'zancadas alternas salto lunge jump' },
+    { name:'Circuito 4 esquinas', detail:'3 rondas completas', tag:'hiit', muscle:'full', equipo:['esterilla'], desc:'10 flexiones → 15 sentadillas → 20 mountain climbers → 10 burpees. Sin descanso dentro de la ronda. 90s entre rondas. Circuito de cuerpo completo sin equipo.', sets:['Ronda 1','Ronda 2','Ronda 3'], video:'circuito hiit sin equipo casa' },
+    { name:'KB snatch', detail:'4 × 5 reps c/lado', tag:'hiit', muscle:'full', equipo:['kettlebell'], desc:'Desde entre las piernas, lanza la KB arriba en un movimiento continuo hasta tenerla sobre la cabeza con el brazo extendido. El ejercicio más completo de kettlebell. Técnica primero.', sets:['Set 1: 8kg×5','Set 2: 8kg×5','Set 3: 8kg×5','Set 4: 8kg×5'], video:'kettlebell snatch tutorial' },
   ],
   movilidad: [
     { name:'Saludo al sol', detail:'3 × 5 repeticiones', tag:'movilidad', muscle:'full', equipo:['esterilla'], desc:'Secuencia completa de yoga: de pie → brazos arriba → flexión → perro boca abajo → plancha → cobra → vuelta. Respira en cada posición.', sets:['Serie 1','Serie 2','Serie 3'], video:'saludo al sol yoga' },
@@ -584,8 +639,79 @@ const exerciseDB = {
     { name:'Movilidad torácica (suelo)', detail:'3 × 10 reps', tag:'movilidad', muscle:'espalda', equipo:['esterilla'], desc:'Tumbado de lado, rodilla doblada. Lleva el brazo de arriba hacia atrás abriendo el pecho. Sigue la mano con la mirada.', sets:['Izq ×10','Der ×10','×2'], video:'movilidad toracica suelo' },
     { name:'Pigeon pose', detail:'2 × 90s c/lado', tag:'movilidad', muscle:'piernas', equipo:['esterilla'], desc:'Desde plancha, lleva una rodilla hacia la mano del mismo lado. Baja el cuerpo. Abre la cadera progresivamente. Respira profundo.', sets:['Izq ×90s','Der ×90s'], video:'pigeon pose yoga cadera' },
     { name:'World greatest stretch', detail:'3 × 5 reps c/lado', tag:'movilidad', muscle:'full', equipo:['esterilla'], desc:'El mejor ejercicio de movilidad total: zancada → codo al suelo → rotación torácica. Trabaja cadera, torácica y tobillo a la vez.', sets:['Izq ×5','Der ×5','×2'], video:'world greatest stretch tutorial' },
+    { name:'90/90 hip stretch', detail:'2 × 90s c/lado', tag:'movilidad', muscle:'piernas', equipo:['esterilla'], desc:'Sentado con ambas piernas en 90°: rodilla delantera y trasera. Mantén la espalda recta. Uno de los mejores ejercicios para la rotación interna y externa de cadera.', sets:['Pos 1: ×90s','Pos 2: ×90s'], video:'90 90 hip stretch movilidad cadera' },
+    { name:'Thread the needle', detail:'3 × 8 reps c/lado', tag:'movilidad', muscle:'espalda', equipo:['esterilla'], desc:'A cuatro patas, pasa un brazo por debajo del cuerpo rotando la columna torácica. Lleva el hombro al suelo. Vuelve y repite. Libera tensión entre los omóplatos.', sets:['Izq ×8','Der ×8','×2'], video:'thread the needle movilidad toracica' },
+    { name:'Estiramiento isquios en suelo', detail:'3 × 60s c/lado', tag:'movilidad', muscle:'piernas', equipo:['esterilla'], desc:'Tumbado, lleva una pierna estirada hacia arriba sujetando el muslo o la pantorrilla. La otra pierna en el suelo. Sin doblar la rodilla. Siente el estiramiento del isquio.', sets:['Izq ×60s','Der ×60s','×2'], video:'estiramiento isquiotibiales suelo' },
+    { name:'Apertura de pecho en suelo', detail:'3 × 60s c/lado', tag:'movilidad', muscle:'pecho', equipo:['esterilla'], desc:'Tumbado boca abajo, extiende un brazo a los lados en T. Rueda ligeramente hacia ese brazo apoyando la rodilla contraria. Abre el pecho y el hombro anterior.', sets:['Izq ×60s','Der ×60s','×2'], video:'apertura pecho suelo estiramiento' },
+    { name:'Cuádriceps de pie', detail:'3 × 45s c/lado', tag:'movilidad', muscle:'piernas', equipo:['esterilla'], desc:'De pie, sujeta el tobillo llevando el talón al glúteo. Rodillas juntas, cadera ligeramente adelantada. Apóyate en la pared si necesitas equilibrio.', sets:['Izq ×45s','Der ×45s','×2'], video:'estiramiento cuadriceps de pie' },
+    { name:'Cat-cow + extensión lateral', detail:'3 × 8 reps c/lado', tag:'movilidad', muscle:'espalda', equipo:['esterilla'], desc:'Desde la posición de gato-vaca, añade una flexión lateral: lleva las caderas a un lado mientras miras hacia ese lado. Moviliza toda la columna en los tres planos.', sets:['Izq ×8','Der ×8','×2'], video:'cat cow lateral flexion movilidad' },
+    { name:'Yin yoga piernas en pared', detail:'1 × 3-5 min', tag:'movilidad', muscle:'piernas', equipo:['esterilla'], desc:'Túmbate con las piernas apoyadas verticalmente en la pared, caderas cerca de ella. Relaja completamente. Excelente para recuperación, drenaje linfático y estiramiento pasivo de isquios.', sets:['×3-5 min'], video:'piernas en pared yoga restaurativo' },
   ],
 };
+
+const warmupDB = {
+  correr: [
+    { name: 'Rotación de tobillo', dur: '30s c/lado', desc: 'De pie apoyado en la pared, levanta un pie y dibuja círculos grandes con el tobillo. Moviliza la articulación antes del impacto.' },
+    { name: 'Balanceo de pierna', dur: '20 reps c/lado', desc: 'Apoyado en la pared, balancea la pierna hacia adelante y atrás de forma relajada aumentando el rango poco a poco. Activa cadera e isquios.' },
+    { name: 'Zancada dinámica con rotación', dur: '8 reps c/lado', desc: 'Da una zancada al frente, lleva el codo del mismo lado al suelo y abre el pecho hacia arriba. Vuelve y alterna. Prepara caderas y torácica.' },
+    { name: 'Skipping suave en sitio', dur: '45s', desc: 'Trota en el sitio levantando las rodillas a la altura de la cadera. Brazos activos como al correr. Empieza lento y sube el ritmo progresivamente.' },
+  ],
+  piernas: [
+    { name: 'Sentadilla sin peso (lenta)', dur: '10 reps', desc: 'Pies a la anchura de los hombros. Baja en 3 segundos, sube en 1. Sin peso, solo para activar el patrón de movimiento y calentar rodillas.' },
+    { name: 'Hip circle (círculos de cadera)', dur: '10 reps c/lado', desc: 'De pie con manos en las caderas, dibuja círculos grandes con las caderas. Primero en un sentido, luego al otro. Moviliza la articulación de la cadera.' },
+    { name: 'Puente de glúteo', dur: '15 reps', desc: 'Tumbado boca arriba, rodillas dobladas. Sube las caderas apretando el glúteo, mantén 1 segundo arriba. Activa glúteo y lumbar antes de cargar.' },
+    { name: 'Zancada estática con pulso', dur: '8 reps c/lado', desc: 'En posición de zancada, baja y sube ligeramente (pulso) 3 veces antes de cambiar de lado. Calienta cuádriceps, isquios y estabilizadores.' },
+  ],
+  espalda: [
+    { name: 'Gato-vaca', dur: '10 reps', desc: 'A cuatro patas, alterna arquear la espalda hacia arriba (gato) y hundirla hacia abajo (vaca). Mueve cada vértebra de forma controlada. Esencial antes de tirar.' },
+    { name: 'Rotación torácica (suelo)', dur: '8 reps c/lado', desc: 'Tumbado de lado con rodilla doblada. Lleva el brazo superior hacia atrás abriendo el pecho. Sigue la mano con la mirada. Moviliza la columna torácica.' },
+    { name: 'Dislocación con goma', dur: '12 reps', desc: 'Sujeta la goma con los brazos extendidos delante. Pasa los brazos por encima de la cabeza hasta detrás sin doblar los codos. Abre el pecho y prepara los hombros.' },
+    { name: 'Remo con goma al 50%', dur: '12 reps ligeras', desc: 'Ancla la goma a media altura. Haz el movimiento de remo con poca resistencia, despacio. Activa dorsales y romboides antes de cargar peso.' },
+  ],
+  pecho: [
+    { name: 'Rotación de hombro con brazo extendido', dur: '10 reps c/lado', desc: 'Brazo extendido a los lados, dibuja círculos pequeños que se van haciendo grandes. Primero hacia adelante, luego hacia atrás. Calienta el manguito rotador.' },
+    { name: 'Apertura de pecho con goma', dur: '12 reps', desc: 'Sujeta la goma por delante con los brazos extendidos. Abre los brazos hacia los lados hasta sentir el estiramiento del pecho. Controla la vuelta.' },
+    { name: 'Flexiones lentas al 50%', dur: '8 reps', desc: 'Flexiones normales pero bajando en 4 segundos y subiendo en 2. Sin llegar al límite. Activa pecho, tríceps y estabilizadores del hombro sin fatigar.' },
+    { name: 'Rotación interna y externa de hombro', dur: '10 reps c/lado', desc: 'Codo doblado a 90° pegado al cuerpo. Rota el antebrazo hacia fuera y hacia dentro lentamente. Prepara el manguito rotador antes del press.' },
+  ],
+  hombros: [
+    { name: 'Péndulo de brazo', dur: '30s c/lado', desc: 'Inclínate hacia adelante apoyando una mano. Deja el otro brazo colgar y balancearlo en círculos suaves. Descomprime y lubrica la articulación del hombro.' },
+    { name: 'Encogimiento y rotación de hombros', dur: '10 reps', desc: 'Sube los hombros hacia las orejas, llévalos hacia atrás y bájalos dibujando un círculo. Luego al revés. Activa trapecio y prepara la cintura escapular.' },
+    { name: 'Press ligero con goma', dur: '12 reps', desc: 'Con una goma ligera, haz el movimiento de press de hombros sin resistencia real. Solo para activar el patrón motor y calentar el deltoides.' },
+    { name: 'Elevaciones laterales sin peso', dur: '12 reps', desc: 'El mismo gesto que la elevación lateral pero sin mancuerna o con las de 3 kg. Muy lento, sintiendo el deltoides medio. Prepara el tendón del supraespinoso.' },
+  ],
+  brazos: [
+    { name: 'Rotación de muñeca', dur: '15 reps c/lado', desc: 'Cierra el puño suavemente y dibuja círculos con la muñeca, primero hacia dentro y luego hacia fuera. Imprescindible antes de curl y extensiones.' },
+    { name: 'Extensión de tríceps con goma ligera', dur: '12 reps', desc: 'Goma o sin resistencia, extiende el brazo sobre la cabeza lentamente. Solo para calentar el tendón del tríceps y el codo antes de cargar.' },
+    { name: 'Curl sin peso o con 3 kg', dur: '12 reps', desc: 'Curl de bíceps con las mancuernas de 3 kg o simplemente con el peso del brazo. Activa el bíceps braquial y el tendón del codo.' },
+    { name: 'Apertura y cierre de dedos', dur: '20 reps', desc: 'Abre la mano al máximo estirando todos los dedos, luego cierra el puño fuerte. Activa el agarre y previene lesiones de antebrazo en sesiones de bíceps.' },
+  ],
+  core: [
+    { name: 'Respiración diafragmática', dur: '5 respiraciones', desc: 'Tumbado boca arriba, manos en el abdomen. Inhala expandiendo la barriga (no el pecho), exhala lento. Activa el transverso abdominal, el músculo más profundo del core.' },
+    { name: 'Gato-vaca', dur: '10 reps', desc: 'A cuatro patas, alterna arquear y hundir la espalda. Moviliza la columna lumbar y activa el core de forma suave antes de ejercicios más intensos.' },
+    { name: 'Bird-dog suave', dur: '8 reps c/lado', desc: 'A cuatro patas, extiende el brazo derecho y la pierna izquierda simultáneamente. Mantén 2 segundos. Sin peso, solo para activar la estabilidad lumbo-pélvica.' },
+    { name: 'Dead bug lento', dur: '6 reps c/lado', desc: 'Tumbado, brazos y piernas arriba. Baja brazo y pierna opuestos lentamente mientras exhalas. Activa el core profundo y los flexores de cadera antes de cargar.' },
+  ],
+  hiit: [
+    { name: 'Jumping jacks suaves', dur: '45s', desc: 'Como los jumping jacks normales pero a la mitad de velocidad. El objetivo es subir la temperatura corporal y el ritmo cardíaco de forma progresiva.' },
+    { name: 'Rotación de cadera en círculo', dur: '10 reps c/lado', desc: 'Manos en las caderas, dibuja círculos grandes. Suelta las articulaciones antes del trabajo explosivo. Moviliza lumbar y cadera.' },
+    { name: 'Sentadilla lenta con pausa', dur: '8 reps', desc: 'Baja en 3 segundos, mantén 2 segundos abajo, sube rápido. Activa cuádriceps, glúteo y estabilizadores sin fatigarte antes del HIIT.' },
+    { name: 'Skipping progresivo', dur: '30s', desc: 'Empieza trotando suave en el sitio y ve subiendo las rodillas y el ritmo cada 10 segundos. Llega al 70% de intensidad justo antes de empezar el HIIT.' },
+  ],
+  movilidad: [
+    { name: 'Respiración profunda', dur: '5 respiraciones', desc: 'Cierra los ojos, inhala por la nariz en 4 tiempos, mantén 2, exhala por la boca en 6. Activa el sistema nervioso parasimpático y prepara el cuerpo para el stretching.' },
+    { name: 'Rotación de cuello suave', dur: '5 reps c/lado', desc: 'Lleva la oreja hacia el hombro, mantén 2 segundos. Luego rota la cabeza hacia el otro lado. Sin forzar. Libera tensión cervical antes de empezar.' },
+    { name: 'Balanceo de brazos cruzados', dur: '20 reps', desc: 'Abre los brazos hacia los lados y crúzalos delante alternando cuál queda arriba. Calienta hombros y pecho de forma dinámica.' },
+  ],
+};
+
+function getWarmup(type, muscle) {
+  if(type === 'correr') return warmupDB.correr;
+  if(type === 'hiit') return warmupDB.hiit;
+  if(type === 'movilidad') return warmupDB.movilidad;
+  if(type === 'fuerza' && muscle && warmupDB[muscle]) return warmupDB[muscle];
+  return warmupDB.core;
+}
 
 function getEquipo() {
   return {
@@ -866,6 +992,12 @@ function selectType(el, type) {
   suggestedMuscle = null;
 }
 
+function scaleSets(sets, scale) {
+  if(scale === 'light') return sets.slice(0, Math.max(2, sets.length - 1));
+  if(scale === 'full' && sets.length < 5) return [...sets, sets[sets.length - 1]];
+  return sets;
+}
+
 function generateWorkout() {
   const type = selectedType;
   if(!type) { showToast('Elige un tipo de entrenamiento'); return; }
@@ -873,10 +1005,41 @@ function generateWorkout() {
   const equipo = getEquipo();
 
   if(type === 'correr') {
-    showScreen('cardio', null);
-    document.querySelectorAll('.nav-btn')[2].classList.add('active');
-    document.querySelectorAll('.nav-btn')[0].classList.remove('active');
-    showToast('Registra tu carrera aquí');
+    const warmup = warmupDB.correr;
+    const warmupHtml = `
+      <div class="ex-card" id="warmup-block" style="border-color:rgba(255,123,53,0.3);margin-bottom:14px;">
+        <div class="ex-header" onclick="toggleWarmup()" style="cursor:pointer;">
+          <div class="ex-num" style="background:rgba(255,123,53,0.15);color:var(--accent);font-size:11px;font-weight:600;">CAL</div>
+          <div class="ex-info">
+            <div class="ex-name">Calentamiento · 5-8 min</div>
+            <div class="ex-detail">${warmup.length} ejercicios · antes de salir a correr</div>
+          </div>
+          <span style="font-size:11px;font-weight:600;color:var(--accent);padding:3px 8px;background:rgba(255,123,53,0.12);border-radius:6px;">ver</span>
+        </div>
+        <div class="ex-body open" id="warmup-body">
+          <p style="font-size:12px;color:var(--text3);margin:10px 0 12px;line-height:1.6;">Haz este calentamiento antes de salir. Activa tobillos, caderas y sube el ritmo cardíaco de forma progresiva.</p>
+          ${warmup.map((w, wi) => `
+            <div style="padding:10px 0;border-bottom:1px solid var(--border);${wi===warmup.length-1?'border-bottom:none;':''}">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+                <span style="font-size:13px;font-weight:500;color:var(--text);">${w.name}</span>
+                <span style="font-size:11px;color:var(--accent);font-family:var(--mono);flex-shrink:0;margin-left:8px;">${w.dur}</span>
+              </div>
+              <p style="font-size:12px;color:var(--text3);line-height:1.6;margin:0;">${w.desc}</p>
+            </div>
+          `).join('')}
+          <button class="log-btn" style="width:100%;margin-top:12px;text-align:center;" id="warmup-done-btn" onclick="markWarmupDone()">✓ Listo — voy a correr</button>
+        </div>
+      </div>
+      <div id="correr-register-btn" style="display:none;">
+        <button class="btn" onclick="goToCardio()">Registrar carrera</button>
+      </div>`;
+
+    document.getElementById('workout-header').textContent = 'Correr · calentamiento';
+    document.getElementById('workout-prog').textContent = '';
+    document.getElementById('prog-bar').style.width = '0%';
+    document.getElementById('workout-section').style.display = 'block';
+    document.getElementById('exercise-list').innerHTML = warmupHtml;
+    document.getElementById('workout-section').scrollIntoView({ behavior:'smooth', block:'start' });
     return;
   }
   if(type === 'descanso') {
@@ -916,7 +1079,39 @@ function generateWorkout() {
     pool = seededShuffle(filtered.length >= 3 ? filtered : exerciseDB.movilidad, weekSeed);
   }
 
-  const count = mins < 30 ? 3 : mins < 50 ? 4 : 5;
+  // Time-aware exercise count and volume scaling
+  // Each fuerza exercise = ~8 min (warmup + 3-4 sets + rest)
+  // HIIT exercise = ~5 min per round block
+  // Movilidad = ~6 min per exercise
+  let count, setsScale;
+  if(type === 'fuerza') {
+    if(mins <= 20)      { count = 3; setsScale = 'light'; }   // 3 ejercicios, 2-3 series
+    else if(mins <= 30) { count = 4; setsScale = 'light'; }   // 4 ejercicios, 3 series
+    else if(mins <= 45) { count = 5; setsScale = 'normal'; }  // 5 ejercicios, 3-4 series
+    else if(mins <= 60) { count = 7; setsScale = 'normal'; }  // 7 ejercicios, 4 series
+    else if(mins <= 75) { count = 8; setsScale = 'full'; }    // 8 ejercicios, 4-5 series
+    else                { count = 9; setsScale = 'full'; }    // 9 ejercicios, 5 series
+  } else if(type === 'hiit') {
+    if(mins <= 20)      { count = 3; setsScale = 'light'; }
+    else if(mins <= 30) { count = 4; setsScale = 'light'; }
+    else if(mins <= 45) { count = 5; setsScale = 'normal'; }
+    else                { count = 6; setsScale = 'full'; }
+  } else {
+    if(mins <= 20)      { count = 2; setsScale = 'light'; }
+    else if(mins <= 40) { count = 3; setsScale = 'normal'; }
+    else                { count = 5; setsScale = 'full'; }
+  }
+
+  // If pool doesn't have enough from the main muscle group, pull from others
+  if(type === 'fuerza' && pool.length < count) {
+    const daySeed2 = getWeekSeed() * 31 + new Date().getDay();
+    const extra = seededShuffle(
+      filterByEquipo(Object.values(exerciseDB.fuerza).flat(), equipo).filter(e => e.muscle !== muscleUsed),
+      daySeed2
+    );
+    pool = [...pool, ...extra];
+  }
+
   const list = pool.slice(0, Math.min(count, pool.length));
   if(!list.length) { showToast('Configura tu equipo en la pestaña Config'); return; }
   completedEx = {};
@@ -928,13 +1123,53 @@ function generateWorkout() {
   document.getElementById('prog-bar').style.width = '0%';
   document.getElementById('workout-section').style.display = 'block';
 
-  document.getElementById('exercise-list').innerHTML = list.map((ex, i) => `
+  // Warmup block
+  const warmup = getWarmup(type, muscleUsed);
+  const warmupHtml = `
+    <div class="ex-card" id="warmup-block" style="border-color:rgba(255,123,53,0.3);margin-bottom:14px;">
+      <div class="ex-header" onclick="toggleWarmup()" style="cursor:pointer;">
+        <div class="ex-num" style="background:rgba(255,123,53,0.15);color:var(--accent);font-size:11px;font-weight:600;">CAL</div>
+        <div class="ex-info">
+          <div class="ex-name">Calentamiento · 5-8 min</div>
+          <div class="ex-detail">${warmup.length} ejercicios · antes de empezar</div>
+        </div>
+        <span style="font-size:11px;font-weight:600;color:var(--accent);padding:3px 8px;background:rgba(255,123,53,0.12);border-radius:6px;">ver</span>
+      </div>
+      <div class="ex-body" id="warmup-body">
+        <p style="font-size:12px;color:var(--text3);margin:10px 0 12px;line-height:1.6;">Dedica 5-8 minutos a este calentamiento antes de los ejercicios principales. Reduce el riesgo de lesión y mejora el rendimiento.</p>
+        ${warmup.map((w, wi) => `
+          <div style="padding:10px 0;border-bottom:1px solid var(--border);${wi===warmup.length-1?'border-bottom:none;':''}">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+              <span style="font-size:13px;font-weight:500;color:var(--text);">${w.name}</span>
+              <span style="font-size:11px;color:var(--accent);font-family:var(--mono);flex-shrink:0;margin-left:8px;">${w.dur}</span>
+            </div>
+            <p style="font-size:12px;color:var(--text3);line-height:1.6;margin:0;">${w.desc}</p>
+          </div>
+        `).join('')}
+        <button class="log-btn" style="width:100%;margin-top:12px;text-align:center;" id="warmup-done-btn" onclick="markWarmupDone()">✓ Calentamiento completado</button>
+      </div>
+    </div>`;
+
+  // Show a summary line under the header
+  const volNote = { light:'Volumen reducido · menos series', normal:'Volumen estándar', full:'Volumen completo · series extra' };
+
+  document.getElementById('exercise-list').innerHTML =
+    warmupHtml +
+    `<div style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:var(--mono);">${list.length} ejercicios · ${volNote[setsScale]}</div>` +
+    list.map((ex, i) => {
+    const scaledSets = scaleSets(ex.sets, setsScale);
+    const setsDetail = setsScale === 'light'
+      ? ex.detail.replace(/4 ×/,'3 ×').replace(/3 ×/,'2-3 ×')
+      : setsScale === 'full'
+      ? ex.detail.replace(/3 ×/,'4-5 ×').replace(/4 ×/,'5 ×')
+      : ex.detail;
+    return `
     <div class="ex-card" id="exc-${i}">
       <div class="ex-header" onclick="toggleEx(${i})">
         <div class="ex-num" id="exn-${i}">${i+1}</div>
         <div class="ex-info">
           <div class="ex-name">${ex.name}</div>
-          <div class="ex-detail">${ex.detail}</div>
+          <div class="ex-detail">${setsDetail}</div>
         </div>
         <span class="ex-tag tag-${ex.tag}">${ex.tag}</span>
       </div>
@@ -944,21 +1179,58 @@ function generateWorkout() {
           <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Ver vídeo: ${ex.name}
         </button>
-        <div class="sets-row">${ex.sets.map(s => `<span class="set-pill">${s}</span>`).join('')}</div>
+        <div class="sets-row">${scaledSets.map(s => `<span class="set-pill">${s}</span>`).join('')}</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,123,53,0.1);border:1px solid rgba(255,123,53,0.3);border-radius:var(--radius-sm);padding:10px;font-size:13px;font-weight:600;color:var(--accent);font-family:var(--font);cursor:pointer;" onclick="launchTimer('${ex.name.replace(/'/g,'`')}','${ex.detail}','${ex.tag}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${ex.tag==='hiit' ? 'Iniciar intervalo' : ex.detail.match(/\ds/) ? 'Iniciar temporizador' : 'Temporizador descanso'}
+          </button>
+        </div>
         <div class="log-row">
           <input class="log-input" id="exw-${i}" type="number" placeholder="${ex.tag==='hiit'?'Rondas hechas':'Peso (kg)'}">
           <button class="log-btn" id="exlb-${i}" onclick="logEx(${i},${list.length},'${ex.name.replace(/'/g,'`')}','${type}','${muscleUsed||''}')">${ex.tag==='hiit'?'Hecho':'Registrar'}</button>
         </div>
       </div>
-    </div>
-  `).join('');
-  toggleEx(0);
+    </div>`;
+  }).join('');
+  toggleWarmup();
   document.getElementById('workout-section').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
 function toggleEx(i) {
   const b = document.getElementById('exb-' + i);
   if(b) b.classList.toggle('open');
+}
+
+function toggleWarmup() {
+  const b = document.getElementById('warmup-body');
+  if(b) b.classList.toggle('open');
+}
+
+function markWarmupDone() {
+  const btn = document.getElementById('warmup-done-btn');
+  const block = document.getElementById('warmup-block');
+  if(btn) { btn.classList.add('done'); btn.textContent = '✓ Calentamiento completado'; }
+  if(block) block.style.borderColor = 'rgba(255,123,53,0.15)';
+  // If it's a running session show the register button, otherwise open first exercise
+  const registerBtn = document.getElementById('correr-register-btn');
+  if(registerBtn) {
+    registerBtn.style.display = 'block';
+    registerBtn.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } else {
+    const firstBody = document.getElementById('exb-0');
+    if(firstBody && !firstBody.classList.contains('open')) firstBody.classList.add('open');
+  }
+  showToast('¡Calentamiento completado!');
+}
+
+function goToCardio() {
+  document.getElementById('workout-section').style.display = 'none';
+  selectedType = null;
+  document.querySelectorAll('.type-chip').forEach(c => c.classList.remove('selected'));
+  showScreen('cardio', null);
+  document.querySelectorAll('.nav-btn')[2].classList.add('active');
+  document.querySelectorAll('.nav-btn')[0].classList.remove('active');
 }
 
 function logEx(i, total, name, type, muscle) {
@@ -982,7 +1254,12 @@ function logEx(i, total, name, type, muscle) {
   const done = Object.keys(completedEx).length;
   document.getElementById('workout-prog').textContent = done + '/' + total;
   document.getElementById('prog-bar').style.width = Math.round((done/total)*100) + '%';
-  if(done === total) showToast('¡Todos los ejercicios completados!');
+  if(done === total) {
+    showToast('¡Todos los ejercicios completados!');
+  } else if(type === 'fuerza') {
+    // Auto-start 60s rest between sets
+    startRest(60, name);
+  }
 }
 
 function finishWorkout() {
@@ -1195,7 +1472,257 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// Init — async load from IndexedDB
+// ── TIMER ENGINE ──────────────────────────────────────────────
+const CIRCUMFERENCE = 2 * Math.PI * 95; // r=95
+
+let timerState = {
+  running: false, interval: null,
+  secsLeft: 0, totalSecs: 0,
+  phase: 'work', // 'work' | 'rest'
+  round: 0, totalRounds: 1,
+  workSecs: 0, restSecs: 0,
+  mode: 'countdown', // 'countdown' | 'hiit' | 'rest'
+  onDone: null,
+  wakeLock: null,
+};
+
+async function acquireWakeLock() {
+  try {
+    if('wakeLock' in navigator) {
+      timerState.wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(_) {}
+}
+function releaseWakeLock() {
+  if(timerState.wakeLock) { timerState.wakeLock.release(); timerState.wakeLock = null; }
+}
+
+function beep(freq=880, dur=120, vol=0.4) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur/1000);
+    osc.start(); osc.stop(ctx.currentTime + dur/1000);
+  } catch(_) {}
+}
+function beepDone() { beep(660,80); setTimeout(()=>beep(880,150),100); }
+function beepStart() { beep(440,80); setTimeout(()=>beep(660,120),90); }
+function vibrate(pattern) { try { navigator.vibrate(pattern); } catch(_) {} }
+
+function timerUpdateUI() {
+  const s = timerState;
+  document.getElementById('t-secs').textContent = s.secsLeft;
+  // Ring
+  const pct = s.secsLeft / s.totalSecs;
+  const offset = CIRCUMFERENCE * (1 - pct);
+  const ring = document.getElementById('t-ring');
+  ring.style.strokeDashoffset = offset;
+  // Color
+  const isRest = s.phase === 'rest';
+  const col = isRest ? '#5ca8ff' : (s.secsLeft <= 3 ? '#ff5c5c' : 'var(--accent)');
+  ring.style.stroke = col;
+  document.getElementById('t-phase').style.color = col;
+  document.getElementById('t-phase').textContent = isRest ? 'descanso' : (s.mode === 'rest' ? 'descanso' : 'trabajo');
+  // Main btn
+  document.getElementById('t-main-btn').textContent = s.running ? 'Pausa' : 'Reanudar';
+  // Rounds
+  if(s.totalRounds > 1) {
+    document.getElementById('t-rounds').innerHTML = Array.from({length: s.totalRounds}, (_,i) => {
+      const cls = i < s.round ? 'done' : i === s.round ? 'active' : '';
+      return `<div class="timer-round-dot ${cls}"></div>`;
+    }).join('');
+  }
+}
+
+function timerTick() {
+  const s = timerState;
+  s.secsLeft--;
+  timerUpdateUI();
+  if(s.secsLeft <= 3 && s.secsLeft > 0) beep(660, 60, 0.2);
+  if(s.secsLeft <= 0) timerNextPhase();
+}
+
+function timerNextPhase() {
+  const s = timerState;
+  clearInterval(s.interval);
+  s.running = false;
+  beepDone();
+  vibrate([200, 100, 200]);
+
+  if(s.mode === 'hiit') {
+    if(s.phase === 'work') {
+      s.phase = 'rest';
+      s.secsLeft = s.restSecs;
+      s.totalSecs = s.restSecs;
+      s.running = true;
+      s.interval = setInterval(timerTick, 1000);
+      timerUpdateUI();
+    } else {
+      s.round++;
+      if(s.round >= s.totalRounds) {
+        timerFinish(); return;
+      }
+      s.phase = 'work';
+      s.secsLeft = s.workSecs;
+      s.totalSecs = s.workSecs;
+      s.running = true;
+      beepStart();
+      s.interval = setInterval(timerTick, 1000);
+      timerUpdateUI();
+    }
+  } else {
+    // countdown or rest — just close cleanly
+    timerFinish();
+  }
+}
+
+function timerFinish() {
+  const s = timerState;
+  clearInterval(s.interval);
+  s.running = false;
+  releaseWakeLock();
+
+  if(s.mode === 'hiit') {
+    // HIIT done — show completion screen briefly
+    document.getElementById('t-secs').textContent = '✓';
+    document.getElementById('t-phase').textContent = '¡completado!';
+    document.getElementById('t-main-btn').textContent = 'Cerrar';
+    document.getElementById('t-ring').style.stroke = 'var(--accent)';
+    document.getElementById('t-ring').style.strokeDashoffset = 0;
+    beepDone(); setTimeout(beepDone, 200);
+    vibrate([100,50,100,50,300]);
+    if(s.onDone) setTimeout(s.onDone, 800);
+  } else {
+    // rest/countdown — close overlay automatically after brief flash
+    document.getElementById('t-secs').textContent = '✓';
+    document.getElementById('t-phase').textContent = '¡listo!';
+    beepDone();
+    vibrate([150, 80, 150]);
+    if(s.onDone) s.onDone();
+    setTimeout(closeTimer, 900);
+  }
+}
+
+function timerToggle() {
+  const s = timerState;
+  // If showing completion screen, close
+  if(document.getElementById('t-secs').textContent === '✓') { closeTimer(); return; }
+  if(s.running) {
+    clearInterval(s.interval);
+    s.running = false;
+    document.getElementById('t-main-btn').textContent = 'Reanudar';
+  } else {
+    s.interval = setInterval(timerTick, 1000);
+    s.running = true;
+    document.getElementById('t-main-btn').textContent = 'Pausa';
+  }
+}
+
+function timerSkip() {
+  clearInterval(timerState.interval);
+  timerState.running = false;
+  timerNextPhase();
+}
+
+function closeTimer() {
+  clearInterval(timerState.interval);
+  timerState.running = false;
+  releaseWakeLock();
+  document.getElementById('timer-overlay').style.display = 'none';
+}
+
+// Launch a simple countdown (planchas, isométricos, movilidad)
+async function startCountdown(secs, name, detail, onDone) {
+  const s = timerState;
+  clearInterval(s.interval);
+  s.mode = 'countdown'; s.phase = 'work';
+  s.secsLeft = secs; s.totalSecs = secs;
+  s.round = 0; s.totalRounds = 1;
+  s.running = true; s.onDone = onDone;
+  document.getElementById('t-name').textContent = name;
+  document.getElementById('t-detail').textContent = detail;
+  document.getElementById('t-rounds').innerHTML = '';
+  document.getElementById('t-main-btn').textContent = 'Pausa';
+  timerUpdateUI();
+  document.getElementById('timer-overlay').style.display = 'flex';
+  await acquireWakeLock();
+  beepStart();
+  s.interval = setInterval(timerTick, 1000);
+}
+
+// Launch HIIT interval timer
+async function startHIIT(workSecs, restSecs, rounds, name) {
+  const s = timerState;
+  clearInterval(s.interval);
+  s.mode = 'hiit'; s.phase = 'work';
+  s.workSecs = workSecs; s.restSecs = restSecs;
+  s.secsLeft = workSecs; s.totalSecs = workSecs;
+  s.round = 0; s.totalRounds = rounds;
+  s.running = true; s.onDone = null;
+  document.getElementById('t-name').textContent = name;
+  document.getElementById('t-detail').textContent = `${workSecs}s trabajo / ${restSecs}s descanso · ${rounds} rondas`;
+  document.getElementById('t-main-btn').textContent = 'Pausa';
+  timerUpdateUI();
+  document.getElementById('timer-overlay').style.display = 'flex';
+  await acquireWakeLock();
+  beepStart();
+  s.interval = setInterval(timerTick, 1000);
+}
+
+// Launch rest timer between sets (60s)
+async function startRest(secs, exName) {
+  const s = timerState;
+  clearInterval(s.interval);
+  s.mode = 'rest'; s.phase = 'rest';
+  s.secsLeft = secs; s.totalSecs = secs;
+  s.round = 0; s.totalRounds = 1;
+  s.running = true; s.onDone = null;
+  document.getElementById('t-name').textContent = 'Descanso';
+  document.getElementById('t-detail').textContent = exName;
+  document.getElementById('t-rounds').innerHTML = '';
+  document.getElementById('t-main-btn').textContent = 'Pausa';
+  document.getElementById('t-phase').textContent = 'descanso';
+  timerUpdateUI();
+  document.getElementById('timer-overlay').style.display = 'flex';
+  await acquireWakeLock();
+  beepStart();
+  s.interval = setInterval(timerTick, 1000);
+}
+
+// Detect exercise type from detail string and launch the right timer
+function launchTimer(exName, detail, tag) {
+  // HIIT: "Xrondas × Ys / Zs" or "Tabata"
+  const hiitMatch = detail.match(/(\d+)\s*rondas?\s*[×x]\s*(\d+)s\s*\/\s*(\d+)s/i);
+  const tabataMatch = detail.match(/Tabata|8\s*rondas/i);
+  // Time-based: "× Xs" or "Xs c/lado"
+  const timeMatch = detail.match(/[×x]\s*(\d+)s/i);
+  const timeMinMatch = detail.match(/(\d+)-(\d+)\s*min/i);
+
+  if(tabataMatch) {
+    startHIIT(20, 10, 8, exName);
+  } else if(hiitMatch) {
+    const rounds = parseInt(hiitMatch[1]);
+    const work = parseInt(hiitMatch[2]);
+    const rest = parseInt(hiitMatch[3]);
+    startHIIT(work, rest, rounds, exName);
+  } else if(timeMatch) {
+    const secs = parseInt(timeMatch[1]);
+    startCountdown(secs, exName, detail, null);
+  } else if(timeMinMatch) {
+    const secs = parseInt(timeMinMatch[1]) * 60;
+    startCountdown(secs, exName, detail, null);
+  } else {
+    // Reps-based → rest timer
+    startRest(60, exName);
+  }
+}
+// ── END TIMER ENGINE ──────────────────────────────────────────
+
+
 (async () => {
   data = await loadDataAsync();
   document.getElementById('today-date').textContent = (() => {
@@ -1207,5 +1734,27 @@ function showToast(msg) {
   renderEquipoResumen();
 })();
 </script>
+<!-- TIMER OVERLAY -->
+<div id="timer-overlay" class="timer-overlay" style="display:none;">
+  <button class="timer-btn-close" onclick="closeTimer()">✕ Cerrar</button>
+  <div class="timer-name" id="t-name"></div>
+  <div class="timer-detail" id="t-detail"></div>
+  <div class="timer-ring-wrap">
+    <svg width="220" height="220" viewBox="0 0 220 220">
+      <circle class="timer-ring-bg" cx="110" cy="110" r="95"/>
+      <circle class="timer-ring-fill" id="t-ring" cx="110" cy="110" r="95" stroke-dasharray="597" stroke-dashoffset="0"/>
+    </svg>
+    <div class="timer-ring-time">
+      <div class="timer-ring-secs" id="t-secs">60</div>
+      <div class="timer-ring-phase" id="t-phase" style="color:var(--accent);">trabajo</div>
+    </div>
+  </div>
+  <div class="timer-rounds" id="t-rounds"></div>
+  <div class="timer-actions">
+    <button class="timer-btn-skip" onclick="timerSkip()">Saltar</button>
+    <button class="timer-btn-main" id="t-main-btn" onclick="timerToggle()">Pausa</button>
+  </div>
+</div>
+
 </body>
 </html>

@@ -213,7 +213,10 @@ input[type=range]::-webkit-slider-thumb {
 .timer-label { text-align: center; font-size: 12px; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
 .timer-btns { display: flex; gap: 8px; }
 
-/* TIMER OVERLAY */
+/* MUSCLE GROUP SELECTOR */
+.muscle-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 9px 6px; font-size: 12px; font-weight: 500; color: var(--text2); font-family: var(--font); cursor: pointer; transition: all 0.15s; text-align: center; }
+.muscle-btn:active { opacity: 0.8; }
+.muscle-btn.selected { background: rgba(255,123,53,0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .timer-overlay {
   position: fixed; inset: 0; z-index: 500;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -293,6 +296,21 @@ input[type=range]::-webkit-slider-thumb {
         <input type="range" id="timeSlider" min="15" max="90" value="45" step="5" oninput="document.getElementById('timeVal').textContent=this.value+'min'">
         <span class="slider-val" id="timeVal">45min</span>
       </div>
+
+      <!-- Muscle group selector — only visible when Fuerza is selected -->
+      <div id="muscle-selector" style="display:none;margin-bottom:14px;">
+        <div class="card-title" style="margin-bottom:8px;">Grupo muscular</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+          <button class="muscle-btn" onclick="selectMuscle(this,'piernas')">🦵 Piernas</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'espalda')">🔙 Espalda</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'pecho')">💪 Pecho</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'hombros')">🏋️ Hombros</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'brazos')">💪 Brazos</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'core')">⚡ Core</button>
+          <button class="muscle-btn" onclick="selectMuscle(this,'')">🎲 Sorpresa</button>
+        </div>
+      </div>
+
       <button class="btn" onclick="generateWorkout()">Generar entrenamiento</button>
     </div>
 
@@ -479,7 +497,7 @@ input[type=range]::-webkit-slider-thumb {
     </div>
 
     <div style="text-align:center;margin-top:24px;padding-bottom:4px;">
-      <span style="font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;">Fit Rayst · v1.1</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;">Fit Rayst · v1.3</span>
     </div>
   </div>
 </div>
@@ -772,62 +790,100 @@ function getWeekSeed() {
 }
 
 function getRecommendation() {
-  const today = new Date().getDay();
   const sessions = data.sessions || [];
   const lastSession = sessions[0];
   const lastDate = lastSession ? lastSession.date : null;
   const daysSinceLast = daysAgo(lastDate);
   const lastType = lastSession ? lastSession.type : null;
   const lastMuscle = lastSession ? lastSession.muscleGroup : null;
-  const recentMuscles = getLastMuscleGroups();
 
+  // ── Step 1: what does the routine say for today? ──
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const todayRoutine = (data.routine || [])[todayIdx];
+  const routineType = todayRoutine ? todayRoutine.type : 'fuerza';
+  const routineLabel = todayRoutine ? todayRoutine.label : '';
+
+  // Extract muscle group from routine label if fuerza (e.g. "Fuerza · piernas" → "piernas")
   const muscleOrder = ['piernas','espalda','pecho','hombros','brazos','core'];
+  const routineMuscle = routineType === 'fuerza'
+    ? (muscleOrder.find(m => routineLabel.toLowerCase().includes(m)) || null)
+    : null;
 
-  // Find the muscle group least recently trained
+  // ── Step 2: find most rested muscle group (fallback) ──
   const muscleLastUsed = {};
   muscleOrder.forEach(m => { muscleLastUsed[m] = 99; });
   sessions.forEach((s, idx) => {
-    if(s.muscleGroup && muscleLastUsed[s.muscleGroup] === 99) {
-      muscleLastUsed[s.muscleGroup] = idx;
-    }
+    if(s.muscleGroup && muscleLastUsed[s.muscleGroup] === 99) muscleLastUsed[s.muscleGroup] = idx;
   });
-  // Most "rested" = highest index (oldest) or never used
-  const nextMuscle = muscleOrder.reduce((best, m) => muscleLastUsed[m] > muscleLastUsed[best] ? m : best, muscleOrder[0]);
+  const restedMuscle = muscleOrder.reduce((best, m) => muscleLastUsed[m] > muscleLastUsed[best] ? m : best, muscleOrder[0]);
 
-  let rec = { type: 'fuerza', muscle: nextMuscle, reason: '', chips: [] };
+  // ── Step 3: build recommendation ──
+  let rec = {
+    type: routineType,
+    muscle: routineMuscle || restedMuscle,
+    reason: '',
+    chips: []
+  };
 
-  // If more than 2 days since last session — restart fresh, no guilt
-  if(daysSinceLast > 2 && lastSession) {
-    rec.muscle = nextMuscle;
-    rec.reason = `Llevas <strong>${daysSinceLast} días</strong> sin entrenar. Sin problema — la rutina se adapta. Empezamos con <strong>${rec.muscle}</strong>, el grupo más descansado.`;
-  } else if(daysSinceLast > 1 && lastSession) {
-    // Skipped a day — pick most rested muscle
-    rec.muscle = nextMuscle;
-    rec.reason = `Ayer no entrenaste, no pasa nada. El grupo más descansado ahora es <strong>${rec.muscle}</strong>.`;
-  } else if(lastType === 'fuerza' && lastMuscle) {
-    const oppMap = { piernas:'espalda', espalda:'pecho', pecho:'hombros', hombros:'brazos', brazos:'core', core:'piernas' };
-    rec.muscle = oppMap[lastMuscle] || nextMuscle;
-    rec.reason = `Ayer trabajaste <strong>${lastMuscle}</strong>. Hoy toca <strong>${rec.muscle}</strong> para dejar recuperar.`;
-  } else if(lastType === 'hiit') {
-    rec.muscle = nextMuscle;
-    rec.reason = `Tras el HIIT de ayer, hoy propongo <strong>fuerza · ${rec.muscle}</strong> a ritmo más controlado.`;
-  } else if(lastType === 'cardio') {
-    rec.muscle = recentMuscles.includes('piernas') ? 'espalda' : 'piernas';
-    rec.reason = `Tras el cardio de ayer, hoy propongo <strong>fuerza · ${rec.muscle}</strong>.`;
-  } else if(lastType === 'descanso') {
-    rec.reason = `Tras el descanso de ayer, el cuerpo está listo. Toca <strong>fuerza · ${rec.muscle}</strong>.`;
-  } else if(today === 0 || today === 6) {
+  // Overrides based on recent history
+  if(!lastSession) {
+    rec.reason = `Primera sesión — según tu rutina hoy toca <strong>${routineLabel || 'fuerza'}</strong>. ¡Buen comienzo!`;
+
+  } else if(daysSinceLast > 2) {
+    rec.reason = `Llevas <strong>${daysSinceLast} días</strong> sin entrenar. Tu rutina marca <strong>${routineLabel}</strong> para hoy — perfecto para retomar.`;
+
+  } else if(routineType === 'descanso') {
+    rec.type = 'descanso';
+    rec.reason = `Tu rutina marca <strong>descanso</strong> hoy. Si quieres hacer algo suave, la movilidad es buena opción.`;
+    rec.chips = [
+      { label:'✓ Descanso', action:'descanso', muscle:null },
+      { label:'Movilidad suave', action:'movilidad', muscle:null },
+    ];
+    return rec;
+
+  } else if(routineType === 'hiit') {
+    // Check if yesterday was also intense — if so, suggest moving to fuerza
+    if(lastType === 'hiit' && daysSinceLast === 1) {
+      rec.type = 'fuerza';
+      rec.muscle = restedMuscle;
+      rec.reason = `Tu rutina dice <strong>HIIT</strong> pero ayer ya hiciste HIIT. Sugiero <strong>fuerza · ${rec.muscle}</strong> para no sobrecargar.`;
+    } else {
+      rec.type = 'hiit';
+      rec.reason = `Tu rutina marca <strong>HIIT</strong> para hoy. ${daysSinceLast > 1 ? 'Llevas ' + daysSinceLast + ' días, el cuerpo está listo.' : ''}`;
+    }
+
+  } else if(routineType === 'cardio') {
+    rec.type = 'correr';
+    rec.reason = `Tu rutina marca <strong>cardio</strong> para hoy. ¿Salimos a correr?`;
+
+  } else if(routineType === 'movilidad') {
     rec.type = 'movilidad';
-    rec.reason = `Es fin de semana. Buen momento para <strong>movilidad y recuperación activa</strong>.`;
-  } else if(!lastSession) {
-    rec.muscle = 'piernas';
-    rec.reason = `Primera sesión — empezamos con <strong>piernas</strong>, el grupo muscular más grande. ¡Buen comienzo!`;
+    rec.reason = `Tu rutina marca <strong>movilidad</strong> para hoy. Ideal para recuperar y prevenir lesiones.`;
+
   } else {
-    rec.reason = `Basándome en tu historial, el grupo más descansado es <strong>${rec.muscle}</strong>.`;
+    // routineType === 'fuerza'
+    // Check if the recommended muscle group was already trained yesterday
+    const oppMap = { piernas:'espalda', espalda:'pecho', pecho:'hombros', hombros:'brazos', brazos:'core', core:'piernas' };
+    if(lastType === 'fuerza' && lastMuscle && lastMuscle === rec.muscle && daysSinceLast === 1) {
+      // Same muscle as yesterday — rotate to next
+      rec.muscle = oppMap[lastMuscle] || restedMuscle;
+      rec.reason = `Tu rutina dice <strong>fuerza · ${routineMuscle}</strong> pero ayer ya lo trabajaste. Cambio a <strong>${rec.muscle}</strong> para recuperar bien.`;
+    } else if(lastType === 'hiit' && daysSinceLast === 1) {
+      rec.reason = `Tras el HIIT de ayer, hoy toca <strong>fuerza · ${rec.muscle}</strong> según tu rutina. Buen cambio de ritmo.`;
+    } else {
+      rec.reason = `Tu rutina marca <strong>fuerza · ${rec.muscle || routineLabel.replace('Fuerza · ','')}</strong> para hoy.${daysSinceLast > 1 ? ' Llevas ' + daysSinceLast + ' días, el cuerpo está recuperado.' : ''}`;
+    }
   }
 
+  // ── Chips ──
+  const mainLabel = rec.type === 'fuerza' ? `✓ Fuerza · ${rec.muscle}`
+    : rec.type === 'hiit' ? '✓ HIIT'
+    : rec.type === 'correr' ? '✓ Salir a correr'
+    : rec.type === 'movilidad' ? '✓ Movilidad'
+    : '✓ Descanso';
+
   rec.chips = [
-    { label: `✓ ${rec.type === 'fuerza' ? 'Fuerza · ' + rec.muscle : rec.type === 'movilidad' ? 'Movilidad' : 'HIIT'}`, action: rec.type, muscle: rec.muscle },
+    { label: mainLabel, action: rec.type, muscle: rec.muscle },
     { label: 'HIIT en su lugar', action: 'hiit', muscle: null },
     { label: 'Movilidad', action: 'movilidad', muscle: null },
   ];
@@ -848,8 +904,23 @@ function applyRec(type, muscle) {
   const chip = document.querySelector(`.type-chip[data-type="${type}"]`);
   if(chip) chip.classList.add('selected');
   selectedType = type;
-  if(muscle) suggestedMuscle = muscle;
-  showToast(type === 'movilidad' ? 'Movilidad seleccionada' : type === 'hiit' ? 'HIIT seleccionado' : `Fuerza · ${muscle} seleccionado`);
+  suggestedMuscle = muscle || null;
+  // Show muscle selector and preselect recommended muscle
+  const sel = document.getElementById('muscle-selector');
+  if(type === 'fuerza') {
+    sel.style.display = 'block';
+    document.querySelectorAll('.muscle-btn').forEach(b => {
+      b.classList.toggle('selected', b.textContent.toLowerCase().includes(muscle));
+    });
+  } else {
+    sel.style.display = 'none';
+  }
+  const label = type === 'fuerza' && muscle ? `Fuerza · ${muscle} seleccionado`
+    : type === 'movilidad' ? 'Movilidad seleccionada'
+    : type === 'hiit' ? 'HIIT seleccionado'
+    : type === 'correr' ? '¡A correr!'
+    : 'Descanso seleccionado';
+  showToast(label);
 }
 
 function generateRoutineFromConfig(config) {
@@ -904,9 +975,8 @@ function generateRoutineFromConfig(config) {
     base = base.map(d => d.type === 'hiit' ? {...d, label:'Fuerza ligera · circuito', type:'fuerza'} : d);
   }
 
-  // Mark today
-  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  return base.map((d, i) => ({ ...d, done: false, today: i === todayIdx }));
+  // Return clean routine — today/done calculated dynamically in renderRoutine
+  return base.map(d => ({ day: d.day, label: d.label, type: d.type }));
 }
 
 function saveConfig() {
@@ -1053,6 +1123,22 @@ function selectType(el, type) {
   el.classList.add('selected');
   selectedType = type;
   suggestedMuscle = null;
+  // Show/hide muscle selector
+  const sel = document.getElementById('muscle-selector');
+  if(type === 'fuerza') {
+    sel.style.display = 'block';
+    // Clear any previous muscle selection
+    document.querySelectorAll('.muscle-btn').forEach(b => b.classList.remove('selected'));
+  } else {
+    sel.style.display = 'none';
+  }
+}
+
+function selectMuscle(el, muscle) {
+  document.querySelectorAll('.muscle-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  suggestedMuscle = muscle || null; // null = surprise
+  if(!muscle) showToast('¡Sorpresa! La app elige por ti 🎲');
 }
 
 function scaleSets(sets, scale) {
@@ -1353,6 +1439,8 @@ function finishWorkout() {
   selectedType = null;
   suggestedMuscle = null;
   document.querySelectorAll('.type-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.muscle-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('muscle-selector').style.display = 'none';
   showScreen('progreso', null);
   document.querySelectorAll('.nav-btn')[3].classList.add('active');
   document.querySelectorAll('.nav-btn')[0].classList.remove('active');
@@ -1362,23 +1450,113 @@ function logSession(type, duration, label, muscleGroup) {
   const today = new Date().toISOString().split('T')[0];
   data.sessions.unshift({ date: today, type, duration, label, muscleGroup: muscleGroup || null });
   data.sessions = data.sessions.slice(0, 60);
-  const last = data.lastTrainDate;
-  const diff = Math.round((new Date(today) - new Date(last)) / 86400000);
-  if(last && diff <= 1) { data.streak = (data.streak || 0) + 1; }
-  else { data.streak = 1; }
-  data.lastTrainDate = today;
-  document.getElementById('streak-count').textContent = data.streak + ' días';
+  // Recalculate streak properly after auto-rest fill
+  recalcStreak();
+  saveData(data);
+}
+
+// Returns the routine type for a given date ('fuerza','hiit','cardio','movilidad','descanso')
+function getRoutineTypeForDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+  return (data.routine[idx] || {}).type || 'fuerza';
+}
+
+// Auto-fill past rest days and recalculate streak
+function autoFillRestDays() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayD = new Date(today + 'T12:00:00');
+
+  // Check last 14 days
+  for(let i = 1; i <= 14; i++) {
+    const d = new Date(todayD);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+
+    // Already has a session that day?
+    const hasSession = data.sessions.some(s => s.date === dateStr);
+    if(hasSession) continue;
+
+    // Was it a planned rest day?
+    const routineType = getRoutineTypeForDate(dateStr);
+    if(routineType === 'descanso') {
+      // Auto-insert a silent rest entry so streak doesn't break
+      data.sessions.push({ date: dateStr, type: 'descanso', duration: 0, label: 'Descanso (automático)', muscleGroup: null, auto: true });
+    }
+  }
+  // Sort sessions by date descending
+  data.sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  data.sessions = data.sessions.slice(0, 60);
+}
+
+// Recalculate streak from session history
+function recalcStreak() {
+  autoFillRestDays();
+  const today = new Date().toISOString().split('T')[0];
+  const todayD = new Date(today + 'T12:00:00');
+
+  // Build set of dates with sessions
+  const sessionDates = new Set(data.sessions.map(s => s.date));
+
+  let streak = 0;
+  for(let i = 0; i <= 365; i++) {
+    const d = new Date(todayD);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    if(sessionDates.has(dateStr)) {
+      streak++;
+    } else {
+      // Gap — stop unless it's today with no session yet
+      if(i === 0) continue;
+      break;
+    }
+  }
+
+  data.streak = streak;
+  data.lastTrainDate = data.sessions[0] ? data.sessions[0].date : today;
+  document.getElementById('streak-count').textContent = streak + ' días';
   saveData(data);
 }
 
 function renderRoutine() {
+  // Day index: 0=Lun ... 6=Dom (JS getDay: 0=Dom, 1=Lun ... 6=Sab)
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+
+  // Build set of days trained this week (as indices 0=Lun..6=Dom)
+  const now = new Date();
+  const weekStart = new Date(now);
+  // Week starts Monday
+  const jsDay = now.getDay();
+  weekStart.setDate(now.getDate() - (jsDay === 0 ? 6 : jsDay - 1));
+  weekStart.setHours(0,0,0,0);
+
+  const trainedDays = new Set();
+  (data.sessions || []).forEach(s => {
+    const d = new Date(s.date + 'T12:00:00');
+    if(d >= weekStart) {
+      const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+      trainedDays.add(idx);
+    }
+  });
+
   const list = document.getElementById('routine-list');
-  list.innerHTML = data.routine.map(r => {
+  list.innerHTML = data.routine.map((r, i) => {
+    const isPast = i < todayIdx;
+    const isToday = i === todayIdx;
+    const trained = trainedDays.has(i);
     let statusHtml = '';
-    if(r.done) statusHtml = '<span class="r-status r-done">✓</span>';
-    else if(r.today) statusHtml = '<span class="r-status r-today">hoy</span>';
-    else statusHtml = '<span class="r-status r-pending">—</span>';
-    return `<div class="routine-row"><span class="r-day">${r.day}</span><span class="r-name">${r.label}</span>${statusHtml}</div>`;
+    if(trained) {
+      statusHtml = '<span class="r-status r-done">✓</span>';
+    } else if(isToday) {
+      statusHtml = '<span class="r-status r-today">hoy</span>';
+    } else if(isPast) {
+      statusHtml = '<span class="r-status" style="color:var(--text3);font-size:12px;">—</span>';
+    } else {
+      statusHtml = '<span class="r-status r-pending">—</span>';
+    }
+    // Highlight today's row
+    const rowStyle = isToday ? 'background:rgba(255,123,53,0.06);border-radius:var(--radius-sm);margin:0 -4px;padding:10px 4px;' : '';
+    return `<div class="routine-row" style="${rowStyle}"><span class="r-day" style="${isToday?'color:var(--accent);font-weight:600;':''}">${r.day}</span><span class="r-name" style="${isToday?'color:var(--text);font-weight:500;':''}">${r.label}</span>${statusHtml}</div>`;
   }).join('');
 
   const days = ['L','M','X','J','V','S','D'];
@@ -1389,13 +1567,16 @@ function renderRoutine() {
     movilidad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 100 8 4 4 0 000-8z"/></svg>',
     descanso: '',
   };
-  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  document.getElementById('week-row').innerHTML = data.routine.map((r, i) => `
+  document.getElementById('week-row').innerHTML = data.routine.map((r, i) => {
+    const trained = trainedDays.has(i);
+    const isToday = i === todayIdx;
+    const dotType = trained ? r.type : '';
+    return `
     <div class="day-col">
-      <span class="day-letter">${days[i]}</span>
-      <div class="day-dot ${r.done || r.today ? r.type : ''} ${i === todayIdx ? 'today' : ''}">${typeIcons[r.type] || ''}</div>
-    </div>
-  `).join('');
+      <span class="day-letter" style="${isToday?'color:var(--accent);font-weight:600;':''}">${days[i]}</span>
+      <div class="day-dot ${dotType} ${isToday ? 'today' : ''}">${typeIcons[r.type] || ''}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderProgress() {
@@ -1811,6 +1992,8 @@ function launchTimer(exName, detail, tag) {
 
 (async () => {
   data = await loadDataAsync();
+  // Auto-fill rest days and recalculate streak every time the app opens
+  recalcStreak();
   document.getElementById('today-date').textContent = (() => {
     const d = new Date();
     return DAYS[d.getDay()] + ', ' + d.getDate() + ' de ' + ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][d.getMonth()];

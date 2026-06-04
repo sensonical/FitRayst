@@ -497,7 +497,7 @@ input[type=range]::-webkit-slider-thumb {
     </div>
 
     <div style="text-align:center;margin-top:24px;padding-bottom:4px;">
-      <span style="font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;">Fit Rayst · v1.3</span>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;">Fit Rayst · v1.4</span>
     </div>
   </div>
 </div>
@@ -791,87 +791,151 @@ function getWeekSeed() {
 
 function getRecommendation() {
   const sessions = data.sessions || [];
-  const lastSession = sessions[0];
-  const lastDate = lastSession ? lastSession.date : null;
-  const daysSinceLast = daysAgo(lastDate);
-  const lastType = lastSession ? lastSession.type : null;
-  const lastMuscle = lastSession ? lastSession.muscleGroup : null;
-
-  // ── Step 1: what does the routine say for today? ──
-  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  const todayRoutine = (data.routine || [])[todayIdx];
-  const routineType = todayRoutine ? todayRoutine.type : 'fuerza';
-  const routineLabel = todayRoutine ? todayRoutine.label : '';
-
-  // Extract muscle group from routine label if fuerza (e.g. "Fuerza · piernas" → "piernas")
   const muscleOrder = ['piernas','espalda','pecho','hombros','brazos','core'];
+
+  // ── Helpers ──
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const todayRoutine = (data.routine || [])[todayIdx] || { type:'fuerza', label:'Fuerza' };
+  const routineType = todayRoutine.type;
+  const routineLabel = todayRoutine.label;
   const routineMuscle = routineType === 'fuerza'
     ? (muscleOrder.find(m => routineLabel.toLowerCase().includes(m)) || null)
     : null;
 
-  // ── Step 2: find most rested muscle group (fallback) ──
-  const muscleLastUsed = {};
-  muscleOrder.forEach(m => { muscleLastUsed[m] = 99; });
-  sessions.forEach((s, idx) => {
-    if(s.muscleGroup && muscleLastUsed[s.muscleGroup] === 99) muscleLastUsed[s.muscleGroup] = idx;
+  // Real sessions (non-auto) from last 7 days
+  const realSessions = sessions.filter(s => !s.auto);
+  function realSessionsInLastDays(n) {
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - n);
+    return realSessions.filter(s => new Date(s.date + 'T12:00:00') >= cutoff);
+  }
+
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const twoDaysAgo = new Date(); twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
+
+  const lastReal = realSessions[0];
+  const lastDate = lastReal ? lastReal.date : null;
+  const daysSinceLast = daysAgo(lastDate);
+
+  // Sessions by date for quick lookup
+  const byDate = {};
+  realSessions.forEach(s => { if(!byDate[s.date]) byDate[s.date] = []; byDate[s.date].push(s); });
+
+  const yesterdaySessions = byDate[yesterdayStr] || [];
+  const twoDaysAgoSessions = byDate[twoDaysAgoStr] || [];
+
+  const yesterdayTypes = yesterdaySessions.map(s => s.type);
+  const yesterdayMuscles = yesterdaySessions.map(s => s.muscleGroup).filter(Boolean);
+  const twoDaysTypes = twoDaysAgoSessions.map(s => s.type);
+
+  // ── Muscle freshness: days since each group was last trained ──
+  const muscleDaysSince = {};
+  muscleOrder.forEach(m => { muscleDaysSince[m] = 99; });
+  realSessions.forEach(s => {
+    if(s.muscleGroup && muscleDaysSince[s.muscleGroup] === 99) {
+      muscleDaysSince[s.muscleGroup] = daysAgo(s.date);
+    }
   });
-  const restedMuscle = muscleOrder.reduce((best, m) => muscleLastUsed[m] > muscleLastUsed[best] ? m : best, muscleOrder[0]);
 
-  // ── Step 3: build recommendation ──
-  let rec = {
-    type: routineType,
-    muscle: routineMuscle || restedMuscle,
-    reason: '',
-    chips: []
-  };
+  // Most rested muscle (highest days since last trained)
+  const restedMuscle = muscleOrder.reduce((best, m) =>
+    muscleDaysSince[m] > muscleDaysSince[best] ? m : best, muscleOrder[0]);
 
-  // Overrides based on recent history
-  if(!lastSession) {
-    rec.reason = `Primera sesión — según tu rutina hoy toca <strong>${routineLabel || 'fuerza'}</strong>. ¡Buen comienzo!`;
+  // Muscles that need recovery (trained yesterday or today)
+  const tiredMuscles = new Set();
+  yesterdayMuscles.forEach(m => tiredMuscles.add(m));
+  // Cardio/running also tires legs
+  if(yesterdayTypes.includes('cardio') || yesterdayTypes.includes('correr')) {
+    tiredMuscles.add('piernas');
+  }
+  // HIIT tires full body
+  if(yesterdayTypes.includes('hiit')) {
+    muscleOrder.forEach(m => tiredMuscles.add(m));
+  }
 
-  } else if(daysSinceLast > 2) {
-    rec.reason = `Llevas <strong>${daysSinceLast} días</strong> sin entrenar. Tu rutina marca <strong>${routineLabel}</strong> para hoy — perfecto para retomar.`;
+  // Muscles skipped recently (in routine but not trained in last 3 days)
+  const skippedMuscles = [];
+  for(let i = 1; i <= 3; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dStr = d.toISOString().split('T')[0];
+    const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+    const planned = (data.routine[idx] || {});
+    if(planned.type === 'fuerza') {
+      const plannedMuscle = muscleOrder.find(m => (planned.label||'').toLowerCase().includes(m));
+      const trained = (byDate[dStr] || []).some(s => s.type === 'fuerza');
+      if(plannedMuscle && !trained) skippedMuscles.push(plannedMuscle);
+    }
+  }
 
+  // ── Build recommendation ──
+  let rec = { type: routineType, muscle: routineMuscle || restedMuscle, reason: '', chips: [] };
+
+  // CASE 1: No sessions ever
+  if(!lastReal) {
+    rec.reason = `Primera sesión — tu rutina marca <strong>${routineLabel}</strong>. ¡Buen comienzo!`;
+
+  // CASE 2: Planned rest day → respect it
   } else if(routineType === 'descanso') {
     rec.type = 'descanso';
-    rec.reason = `Tu rutina marca <strong>descanso</strong> hoy. Si quieres hacer algo suave, la movilidad es buena opción.`;
+    rec.reason = `Tu rutina marca <strong>descanso</strong> hoy. El cuerpo también progresa descansando.`;
     rec.chips = [
       { label:'✓ Descanso', action:'descanso', muscle:null },
       { label:'Movilidad suave', action:'movilidad', muscle:null },
     ];
     return rec;
 
-  } else if(routineType === 'hiit') {
-    // Check if yesterday was also intense — if so, suggest moving to fuerza
-    if(lastType === 'hiit' && daysSinceLast === 1) {
-      rec.type = 'fuerza';
-      rec.muscle = restedMuscle;
-      rec.reason = `Tu rutina dice <strong>HIIT</strong> pero ayer ya hiciste HIIT. Sugiero <strong>fuerza · ${rec.muscle}</strong> para no sobrecargar.`;
+  // CASE 3: Yesterday was cardio/running → legs are tired, avoid HIIT too
+  } else if(yesterdayTypes.some(t => t === 'cardio' || t === 'correr')) {
+    const freshMuscle = muscleOrder.filter(m => !tiredMuscles.has(m))
+      .reduce((best, m) => muscleDaysSince[m] > muscleDaysSince[best] ? m : best,
+        muscleOrder.find(m => !tiredMuscles.has(m)) || 'espalda');
+    rec.type = 'fuerza';
+    rec.muscle = freshMuscle;
+    if(routineType === 'hiit') {
+      rec.reason = `Tu rutina marca <strong>HIIT</strong> pero ayer corriste — las piernas necesitan recuperar. Mejor <strong>fuerza · ${freshMuscle}</strong> (tren superior) hoy.`;
     } else {
-      rec.type = 'hiit';
-      rec.reason = `Tu rutina marca <strong>HIIT</strong> para hoy. ${daysSinceLast > 1 ? 'Llevas ' + daysSinceLast + ' días, el cuerpo está listo.' : ''}`;
+      rec.reason = `Ayer corriste, así que las piernas están cargadas. Hoy propongo <strong>fuerza · ${freshMuscle}</strong> para no sobrecargarlas.`;
     }
 
-  } else if(routineType === 'cardio') {
-    rec.type = 'correr';
-    rec.reason = `Tu rutina marca <strong>cardio</strong> para hoy. ¿Salimos a correr?`;
+  // CASE 4: Skipped strength session recently → prioritize that muscle
+  } else if(skippedMuscles.length > 0 && routineType === 'fuerza') {
+    const missed = skippedMuscles[0];
+    rec.muscle = missed;
+    rec.reason = `Te saltaste <strong>fuerza · ${missed}</strong> hace ${skippedMuscles.length === 1 ? 'un día' : 'unos días'}. Hoy es buen momento para recuperarlo antes de que se acumule.`;
 
-  } else if(routineType === 'movilidad') {
-    rec.type = 'movilidad';
-    rec.reason = `Tu rutina marca <strong>movilidad</strong> para hoy. Ideal para recuperar y prevenir lesiones.`;
+  // CASE 5: Yesterday was HIIT → suggest strength not HIIT again
+  } else if(yesterdayTypes.includes('hiit') && routineType === 'hiit') {
+    const freshMuscle = muscleOrder.filter(m => !tiredMuscles.has(m))[0] || restedMuscle;
+    rec.type = 'fuerza';
+    rec.muscle = freshMuscle;
+    rec.reason = `Tu rutina dice <strong>HIIT</strong> pero ayer ya fue muy intenso. Mejor <strong>fuerza · ${freshMuscle}</strong> hoy para recuperar bien.`;
 
+  // CASE 6: Planned muscle is tired from yesterday → rotate
+  } else if(routineType === 'fuerza' && routineMuscle && tiredMuscles.has(routineMuscle)) {
+    const freshMuscle = muscleOrder.filter(m => !tiredMuscles.has(m))
+      .reduce((best, m) => muscleDaysSince[m] > muscleDaysSince[best] ? m : best,
+        muscleOrder.find(m => !tiredMuscles.has(m)) || restedMuscle);
+    rec.muscle = freshMuscle;
+    rec.reason = `Tu rutina dice <strong>fuerza · ${routineMuscle}</strong> pero lo trabajaste ayer. Cambio a <strong>${freshMuscle}</strong> para dejar recuperar.`;
+
+  // CASE 7: Long break → welcome back, follow routine
+  } else if(daysSinceLast > 3) {
+    rec.reason = `Llevas <strong>${daysSinceLast} días</strong> sin entrenar. Tu rutina marca <strong>${routineLabel}</strong> — perfecto para retomar sin forzar.`;
+
+  // CASE 8: Everything normal → follow routine
   } else {
-    // routineType === 'fuerza'
-    // Check if the recommended muscle group was already trained yesterday
-    const oppMap = { piernas:'espalda', espalda:'pecho', pecho:'hombros', hombros:'brazos', brazos:'core', core:'piernas' };
-    if(lastType === 'fuerza' && lastMuscle && lastMuscle === rec.muscle && daysSinceLast === 1) {
-      // Same muscle as yesterday — rotate to next
-      rec.muscle = oppMap[lastMuscle] || restedMuscle;
-      rec.reason = `Tu rutina dice <strong>fuerza · ${routineMuscle}</strong> pero ayer ya lo trabajaste. Cambio a <strong>${rec.muscle}</strong> para recuperar bien.`;
-    } else if(lastType === 'hiit' && daysSinceLast === 1) {
-      rec.reason = `Tras el HIIT de ayer, hoy toca <strong>fuerza · ${rec.muscle}</strong> según tu rutina. Buen cambio de ritmo.`;
+    const extra = daysSinceLast > 1 ? ` Llevas ${daysSinceLast} días, el cuerpo está recuperado.` : '';
+    if(routineType === 'hiit') {
+      rec.reason = `Tu rutina marca <strong>HIIT</strong> hoy.${extra}`;
+    } else if(routineType === 'cardio') {
+      rec.type = 'correr';
+      rec.reason = `Tu rutina marca <strong>cardio</strong> hoy. ¿Salimos a correr?`;
+    } else if(routineType === 'movilidad') {
+      rec.reason = `Tu rutina marca <strong>movilidad</strong> hoy. Ideal para recuperar.`;
     } else {
-      rec.reason = `Tu rutina marca <strong>fuerza · ${rec.muscle || routineLabel.replace('Fuerza · ','')}</strong> para hoy.${daysSinceLast > 1 ? ' Llevas ' + daysSinceLast + ' días, el cuerpo está recuperado.' : ''}`;
+      rec.reason = `Tu rutina marca <strong>fuerza · ${rec.muscle || routineLabel.replace('Fuerza · ','')}</strong> hoy.${extra}`;
     }
   }
 
